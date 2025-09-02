@@ -142,4 +142,59 @@ describe('applyMove', () => {
       expect(result.newState.moveHistory).toEqual([0])
     })
   })
+
+  describe('Step 8 specific requirements', () => {
+    describe('win precedence over removal', () => {
+      it('should win immediately when placing 4th mark creates win, no removal', () => {
+        const game = newGame()
+        
+        // Set up X to have 3 marks and win on 4th placement
+        // X at 0, 1, 2 (horizontal setup)
+        const game1 = applyMove(game, 0) // X at 0
+        const game2 = applyMove(game1.newState, 3) // O at 3
+        const game3 = applyMove(game2.newState, 1) // X at 1
+        const game4 = applyMove(game3.newState, 4) // O at 4
+        const game5 = applyMove(game4.newState, 2) // X at 2
+        
+        // X now has 3 marks: [0, 1, 2] - this is already a win!
+        expect(game5.newState.result).toBe('win')
+        expect(game5.newState.winLine).toEqual([0, 1, 2])
+        
+        // All X marks should remain (no removal on win)
+        expect(game5.newState.board[0]).toBe('X')
+        expect(game5.newState.board[1]).toBe('X')
+        expect(game5.newState.board[2]).toBe('X')
+      })
+    })
+
+    describe('draw conditions', () => {
+      it('should draw by time cap (180 seconds)', () => {
+        const game = newGame()
+        // Create a game that started 181 seconds ago
+        const oldGame = {
+          ...game,
+          startTime: Date.now() - 181000 // 181 seconds ago
+        }
+        
+        // Any move should trigger draw by time cap
+        const result = applyMove(oldGame, 0)
+        expect(result.success).toBe(true)
+        expect(result.newState.result).toBe('draw')
+      })
+
+      it('should not draw if time is under 180 seconds', () => {
+        const game = newGame()
+        // Create a game that started 179 seconds ago
+        const recentGame = {
+          ...game,
+          startTime: Date.now() - 179000 // 179 seconds ago
+        }
+        
+        // Move should succeed without draw
+        const result = applyMove(recentGame, 0)
+        expect(result.success).toBe(true)
+        expect(result.newState.result).toBe('ongoing')
+      })
+    })
+  })
 })

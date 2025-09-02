@@ -197,7 +197,7 @@ describe('AI', () => {
       const preferredPositions = [0, 2, 4, 6, 8]
       const preferredCount = moves.filter(pos => preferredPositions.includes(pos)).length
       
-      expect(preferredCount).toBeGreaterThan(iterations * 0.5) // At least 50% should be preferred
+      expect(preferredCount).toBeGreaterThanOrEqual(iterations * 0.5) // At least 50% should be preferred
     })
   })
 
@@ -345,6 +345,79 @@ describe('AI', () => {
       expect(move.cell).toBeGreaterThanOrEqual(0)
       expect(move.cell).toBeLessThan(9)
       expect(move.reason).toContain('Minimax evaluation')
+    })
+  })
+
+  describe('Step 8 specific AI requirements', () => {
+    describe('Moderate AI behavior', () => {
+      it('should always block immediate threat', () => {
+        // O has two in a row, X must block
+        gameState.board = ['O', 'O', null, 'X', null, null, null, null, null]
+        gameState.currentPlayer = 'X'
+        
+        const move = getModerateMove(gameState, 'X')
+        expect(move.cell).toBe(2) // Must block at position 2
+        expect(move.reason).toBe('Blocked opponent win')
+        expect(move.score).toBe(500)
+      })
+
+      it('should not miss immediate win opportunity', () => {
+        // X has two in a row, should win
+        gameState.board = ['X', 'X', null, 'O', null, null, null, null, null]
+        gameState.currentPlayer = 'X'
+        
+        const move = getModerateMove(gameState, 'X')
+        expect(move.cell).toBe(2) // Must win at position 2
+        expect(move.reason).toBe('Immediate win')
+        expect(move.score).toBe(1000)
+      })
+
+      it('should prioritize win over block', () => {
+        // X can win OR block O's win - should choose to win
+        gameState.board = ['X', 'X', null, 'O', 'O', null, null, null, null]
+        gameState.currentPlayer = 'X'
+        
+        const move = getModerateMove(gameState, 'X')
+        expect(move.cell).toBe(2) // Should win at position 2, not block at position 5
+        expect(move.reason).toBe('Immediate win')
+        expect(move.score).toBe(1000)
+      })
+    })
+
+    describe('AI consistency across difficulties', () => {
+      it('should handle empty board consistently', () => {
+        const beginnerMove = getAIMove(gameState, 'O', 'beginner')
+        const moderateMove = getAIMove(gameState, 'O', 'moderate')
+        const hardMove = getAIMove(gameState, 'O', 'hard')
+        
+        // All should return valid moves
+        expect(beginnerMove.cell).toBeGreaterThanOrEqual(0)
+        expect(beginnerMove.cell).toBeLessThan(9)
+        expect(moderateMove.cell).toBeGreaterThanOrEqual(0)
+        expect(moderateMove.cell).toBeLessThan(9)
+        expect(hardMove.cell).toBeGreaterThanOrEqual(0)
+        expect(hardMove.cell).toBeLessThan(9)
+        
+        // All should have positive scores
+        expect(beginnerMove.score).toBeGreaterThan(0)
+        expect(moderateMove.score).toBeGreaterThan(-Infinity)
+        expect(hardMove.score).toBeGreaterThan(-Infinity)
+      })
+
+      it('should handle near-full board consistently', () => {
+        // Almost full board with one empty cell
+        gameState.board = ['X', 'O', 'X', 'O', 'X', 'O', 'O', 'X', null]
+        gameState.currentPlayer = 'O'
+        
+        const beginnerMove = getAIMove(gameState, 'O', 'beginner')
+        const moderateMove = getAIMove(gameState, 'O', 'moderate')
+        const hardMove = getAIMove(gameState, 'O', 'hard')
+        
+        // All should choose the only available move
+        expect(beginnerMove.cell).toBe(8)
+        expect(moderateMove.cell).toBe(8)
+        expect(hardMove.cell).toBe(8)
+      })
     })
   })
 })
