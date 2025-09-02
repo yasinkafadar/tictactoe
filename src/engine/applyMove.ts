@@ -1,4 +1,4 @@
-import type { GameState, CellIndex, Player, MoveOutcome } from './types'
+import type { GameState, CellIndex, MoveOutcome } from './types'
 import { checkWin, checkDraw, countPlayerMarks } from './rules'
 import { other } from './types'
 
@@ -39,16 +39,21 @@ export function applyMove(state: GameState, cell: CellIndex): MoveOutcome {
   // Check for immediate win
   const winCheck = checkWin(newBoard, currentPlayer)
   if (winCheck.hasWin) {
+    const winState: GameState = {
+      ...state,
+      board: newBoard,
+      result: 'win',
+      moveCount: newMoveCount,
+      moveHistory: newMoveHistory
+    }
+    
+    if (winCheck.winLine) {
+      winState.winLine = winCheck.winLine
+    }
+    
     return {
       success: true,
-      newState: {
-        ...state,
-        board: newBoard,
-        result: 'win',
-        moveCount: newMoveCount,
-        moveHistory: newMoveHistory,
-        winLine: winCheck.winLine
-      }
+      newState: winState
     }
   }
   

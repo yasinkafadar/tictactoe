@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react'
-import type { GameState, Player } from '../engine/types'
+import { useState, useEffect } from 'react'
+import type { GameState } from '../engine/types'
 import type { DifficultyLevel } from '../engine/scoring'
 import { getTimerState } from '../lib/timer'
 import { calculateScore } from '../engine/scoring'

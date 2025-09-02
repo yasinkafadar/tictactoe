@@ -1,8 +1,8 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import Board from './Board'
 import HUD from './HUD'
 import ResultModal from './ResultModal'
-import { newGame, other } from '../engine/types'
+import { newGame } from '../engine/types'
 import { applyMove } from '../engine/applyMove'
 import { checkDraw } from '../engine/rules'
 import { getAIMove } from '../engine/ai'
@@ -17,8 +17,8 @@ export default function App() {
   const [gameState, setGameState] = useState<GameState>(() => newGame(HUMAN_PLAYER))
   const [difficulty, setDifficulty] = useState<DifficultyLevel>('beginner')
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [totalPlayerScore, setTotalPlayerScore] = useState(0)
-  const [totalOpponentScore, setTotalOpponentScore] = useState(0)
+  const [totalPlayerScore] = useState(0)
+  const [totalOpponentScore] = useState(0)
   const [isCpuThinking, setIsCpuThinking] = useState(false)
   const isCpuThinkingRef = useRef(false)
 

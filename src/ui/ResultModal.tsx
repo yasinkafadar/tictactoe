@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import type { GameState } from '../engine/types'
 import type { DifficultyLevel } from '../engine/ai'
 import type { ScoreBreakdown } from '../engine/scoring'

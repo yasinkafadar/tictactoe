@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { checkWin, checkDraw, countPlayerMarks, getPlayerMarkIndices, WIN_LINES } from '../rules'
-import type { Mark, Player } from '../types'
+import type { Mark } from '../types'
 
 describe('rules', () => {
   describe('WIN_LINES', () => {

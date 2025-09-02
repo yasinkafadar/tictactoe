@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import Cell from './Cell'
 import type { GameState, CellIndex } from '../engine/types'
 

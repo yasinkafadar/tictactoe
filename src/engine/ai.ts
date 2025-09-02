@@ -1,6 +1,6 @@
 import type { GameState, CellIndex, Player, Mark } from './types'
 import { applyMove } from './applyMove'
-import { checkWin, countPlayerMarks } from './rules'
+import { checkWin } from './rules'
 import { other } from './types'
 
 export type DifficultyLevel = 'beginner' | 'moderate' | 'hard'
@@ -157,9 +157,9 @@ export function getBeginnerMove(gameState: GameState, player: Player): AIMove {
   }
   
   // Random move with light preferences
-  const center = 4
-  const corners = [0, 2, 6, 8]
-  const sides = [1, 3, 5, 7]
+  const center: CellIndex = 4
+  const corners: CellIndex[] = [0, 2, 6, 8]
+  const sides: CellIndex[] = [1, 3, 5, 7]
   
   // Prefer center, then corners, then sides
   let preferredMoves: CellIndex[] = []

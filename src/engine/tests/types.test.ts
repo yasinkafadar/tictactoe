@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { newGame, other, type Player } from '../types'
+import { newGame, other } from '../types'
 
 describe('types', () => {
   describe('newGame', () => {

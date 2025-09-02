@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach } from 'vitest'
 import {
   getLegalMoves,
   findImmediateWin,
@@ -9,8 +9,8 @@ import {
   getModerateMove,
   getAIMove
 } from '../ai'
-import { newGame, other } from '../types'
-import type { GameState, Player } from '../types'
+import { newGame } from '../types'
+import type { GameState } from '../types'
 
 describe('AI', () => {
   let gameState: GameState
