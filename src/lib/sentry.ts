@@ -14,20 +14,20 @@ export async function initializeSentry(): Promise<void> {
   try {
     const { init, captureException, captureMessage, setContext, setUser } = await import('@sentry/browser');
     
+    const meta = import.meta as any;
+    
     init({
-      dsn: import.meta.env.VITE_SENTRY_DSN,
-      environment: import.meta.env.MODE,
-      release: import.meta.env.VITE_APP_VERSION || '1.0.0',
+      dsn: meta.env?.VITE_SENTRY_DSN,
+      environment: meta.env?.MODE || 'development',
+      release: meta.env?.VITE_APP_VERSION || '1.0.0',
       integrations: [
         // Add performance monitoring
-        new (await import('@sentry/tracing')).BrowserTracing({
-          routingInstrumentation: new (await import('@sentry/tracing')).BrowserTracing(),
-        }),
+        new (await import('@sentry/tracing')).BrowserTracing(),
       ],
       tracesSampleRate: 0.1, // 10% of transactions
       beforeSend(event) {
         // Filter out non-critical errors in production
-        if (import.meta.env.MODE === 'production') {
+        if (meta.env?.MODE === 'production') {
           // Don't send console errors or network errors
           if (event.exception) {
             const error = event.exception.values?.[0];

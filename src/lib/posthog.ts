@@ -14,12 +14,14 @@ export async function initializePostHog(): Promise<void> {
     
     posthog = new PostHog();
     
-    posthog.init(import.meta.env.VITE_POSTHOG_KEY, {
-      api_host: import.meta.env.VITE_POSTHOG_HOST || 'https://app.posthog.com',
+    const meta = import.meta as any;
+    
+    posthog.init(meta.env?.VITE_POSTHOG_KEY, {
+      api_host: meta.env?.VITE_POSTHOG_HOST || 'https://app.posthog.com',
       person_profiles: 'identified_only',
       capture_pageview: false, // We'll handle this manually
       capture_pageleave: true,
-      loaded: (posthog) => {
+      loaded: (posthog: any) => {
         console.log('📊 PostHog initialized for analytics');
         
         // Set user properties
@@ -72,12 +74,12 @@ export function trackGameEvent(event: string, gameData?: Record<string, any>): v
 /**
  * Track AI performance metrics
  */
-export function trackAIPerformance(difficulty: string, moveTime: number, moveCount: number): void {
+export function trackAIPerformance(difficulty: string, moveTime: number, _moveCount: number): void {
   trackEvent('ai_performance', {
     difficulty,
     move_time_ms: moveTime,
-    move_count: moveCount,
-    performance_rating: calculatePerformanceRating(moveTime, moveCount)
+    move_count: _moveCount,
+    performance_rating: calculatePerformanceRating(moveTime, _moveCount)
   });
 }
 
@@ -164,7 +166,7 @@ function getBrowserInfo(): string {
 /**
  * Calculate performance rating based on move time and count
  */
-function calculatePerformanceRating(moveTime: number, moveCount: number): string {
+function calculatePerformanceRating(moveTime: number, _moveCount: number): string {
   if (moveTime < 100) return 'excellent';
   if (moveTime < 500) return 'good';
   if (moveTime < 1000) return 'average';

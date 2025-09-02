@@ -64,7 +64,7 @@ describe('Monitoring', () => {
         initializeSentry: vi.fn().mockRejectedValue(new Error('Sentry init failed'))
       }))
       
-      mockEnv.VITE_SENTRY_DSN = 'https://test@sentry.io/123'
+      mockEnv.VITE_SENTRY_DSN = 'https://test@sentry.io/123' as any
       
       await expect(monitoring.initialize()).resolves.not.toThrow()
     })

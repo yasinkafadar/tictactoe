@@ -23,22 +23,22 @@ export interface MonitoringConfig {
  * Get monitoring configuration from environment variables
  */
 export function getMonitoringConfig(): MonitoringConfig {
-  const isProduction = import.meta.env.MODE === 'production';
+  const meta = import.meta as any;
   
   return {
     sentry: {
-      enabled: !!import.meta.env.VITE_SENTRY_DSN,
-      dsn: import.meta.env.VITE_SENTRY_DSN,
-      environment: import.meta.env.MODE,
-      release: import.meta.env.VITE_APP_VERSION || '1.0.0'
+      enabled: !!meta.env?.VITE_SENTRY_DSN,
+      dsn: meta.env?.VITE_SENTRY_DSN,
+      environment: meta.env?.MODE || 'development',
+      release: meta.env?.VITE_APP_VERSION || '1.0.0'
     },
     posthog: {
-      enabled: !!import.meta.env.VITE_POSTHOG_KEY,
-      key: import.meta.env.VITE_POSTHOG_KEY,
-      host: import.meta.env.VITE_POSTHOG_HOST || 'https://app.posthog.com'
+      enabled: !!meta.env?.VITE_POSTHOG_KEY,
+      key: meta.env?.VITE_POSTHOG_KEY,
+      host: meta.env?.VITE_POSTHOG_HOST || 'https://app.posthog.com'
     },
     webVitals: {
-      enabled: !!import.meta.env.VITE_POSTHOG_KEY // Only enable if PostHog is available
+      enabled: !!meta.env?.VITE_POSTHOG_KEY // Only enable if PostHog is available
     }
   };
 }
