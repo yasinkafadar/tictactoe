@@ -68,7 +68,7 @@ export function applyMove(state: GameState, cell: CellIndex): MoveOutcome {
         // This is the oldest mark, remove it from the new board
         finalBoard = [...newBoard]
         finalBoard[moveIndex] = null
-        console.log(`Rolling rule: removed oldest mark at position ${moveIndex} for player ${currentPlayer}`)
+
         break
       }
     }
@@ -92,12 +92,7 @@ export function applyMove(state: GameState, cell: CellIndex): MoveOutcome {
     moveHistory: newMoveHistory
   }
   
-  console.log(`Move applied: Player ${currentPlayer} at position ${cell}`)
-  console.log(`Board before: [${state.board.join(', ')}]`)
-  console.log(`Board after: [${finalBoard.join(', ')}]`)
-  console.log(`Player ${currentPlayer} mark count before: ${playerMarkCountBeforeMove}, after: ${countPlayerMarks(finalBoard, currentPlayer)}`)
-  
-  return {
+    return {
     success: true,
     newState
   }

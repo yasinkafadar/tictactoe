@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react'
 import type { GameState } from '../engine/types'
-import type { DifficultyLevel, ScoreBreakdown } from '../engine/scoring'
+import type { DifficultyLevel } from '../engine/ai'
+import type { ScoreBreakdown } from '../engine/scoring'
 import { calculateScore } from '../engine/scoring'
 
 interface ResultModalProps {

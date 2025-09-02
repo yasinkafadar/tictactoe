@@ -7,7 +7,7 @@ import { applyMove } from '../engine/applyMove'
 import { checkDraw } from '../engine/rules'
 import { getAIMove } from '../engine/ai'
 import type { GameState, CellIndex, Player } from '../engine/types'
-import type { DifficultyLevel } from '../engine/scoring'
+import type { DifficultyLevel } from '../engine/ai'
 import './App.css'
 
 const HUMAN_PLAYER: Player = 'X'
@@ -28,13 +28,8 @@ export default function App() {
       return
     }
 
-    console.log('Human move at cell:', cellIndex)
-    console.log('Game state before move:', gameState)
-    
     const moveResult = applyMove(gameState, cellIndex)
     if (moveResult.success) {
-      console.log('Move result:', moveResult)
-      console.log('New state after human move:', moveResult.newState)
       setGameState(moveResult.newState)
     }
   }, [gameState, isCpuThinking])
@@ -46,14 +41,6 @@ export default function App() {
     }
 
     try {
-      // Only use AI for beginner and moderate difficulties
-      if (difficulty === 'hard') {
-        // For now, use moderate AI until hard is implemented
-        const aiMove = getAIMove(state, CPU_PLAYER, 'moderate')
-        const moveResult = applyMove(state, aiMove.cell)
-        return moveResult.success ? moveResult.newState : state
-      }
-      
       const aiMove = getAIMove(state, CPU_PLAYER, difficulty)
       const moveResult = applyMove(state, aiMove.cell)
       
@@ -83,8 +70,6 @@ export default function App() {
       return
     }
 
-    console.log('CPU turn starting, current player:', gameState.currentPlayer, 'CPU player:', CPU_PLAYER)
-    
     // Set thinking state immediately to prevent re-triggering
     isCpuThinkingRef.current = true
     setIsCpuThinking(true)
@@ -98,13 +83,9 @@ export default function App() {
           return currentState
         }
         
-        console.log('CPU making move...')
         const newState = makeCpuMove(currentState)
         isCpuThinkingRef.current = false
         setIsCpuThinking(false)
-        console.log('CPU move complete, new state:', newState)
-        console.log('Board after CPU move:', newState.board)
-        console.log('Current player after CPU move:', newState.currentPlayer)
         return newState
       })
     }, 250) // Short delay for better UX

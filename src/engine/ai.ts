@@ -247,6 +247,134 @@ export function getModerateMove(gameState: GameState, player: Player): AIMove {
 }
 
 /**
+ * Hard AI: Minimax with alpha-beta pruning
+ */
+export function getHardMove(gameState: GameState, player: Player): AIMove {
+  const legalMoves = getLegalMoves(gameState)
+  if (legalMoves.length === 0) {
+    throw new Error('No legal moves available')
+  }
+
+  // Use minimax with alpha-beta pruning
+  const maxDepth = 5 // Adjust depth based on performance
+  let bestMove: CellIndex = legalMoves[0]
+  let bestScore = -Infinity
+  let alpha = -Infinity
+  let beta = Infinity
+
+  for (const move of legalMoves) {
+    const moveResult = applyMove(gameState, move)
+    if (!moveResult.success) continue
+
+    const score = minimax(
+      moveResult.newState,
+      maxDepth - 1,
+      false,
+      alpha,
+      beta,
+      player
+    )
+
+    if (score > bestScore) {
+      bestScore = score
+      bestMove = move
+    }
+
+    alpha = Math.max(alpha, bestScore)
+    if (alpha >= beta) break // Alpha-beta pruning
+  }
+
+  return {
+    cell: bestMove,
+    score: bestScore,
+    reason: `Minimax evaluation (depth ${maxDepth})`
+  }
+}
+
+/**
+ * Minimax algorithm with alpha-beta pruning
+ */
+function minimax(
+  state: GameState,
+  depth: number,
+  isMaximizing: boolean,
+  alpha: number,
+  beta: number,
+  maximizingPlayer: Player
+): number {
+  // Terminal state evaluation
+  if (state.result !== 'ongoing' || depth === 0) {
+    return evaluatePosition(state, maximizingPlayer)
+  }
+
+  const legalMoves = getLegalMoves(state)
+  
+  if (isMaximizing) {
+    let maxScore = -Infinity
+    
+    for (const move of legalMoves) {
+      const moveResult = applyMove(state, move)
+      if (!moveResult.success) continue
+
+      const score = minimax(
+        moveResult.newState,
+        depth - 1,
+        false,
+        alpha,
+        beta,
+        maximizingPlayer
+      )
+
+      maxScore = Math.max(maxScore, score)
+      alpha = Math.max(alpha, score)
+      
+      if (alpha >= beta) break // Alpha-beta pruning
+    }
+    
+    return maxScore
+  } else {
+    let minScore = Infinity
+    
+    for (const move of legalMoves) {
+      const moveResult = applyMove(state, move)
+      if (!moveResult.success) continue
+
+      const score = minimax(
+        moveResult.newState,
+        depth - 1,
+        true,
+        alpha,
+        beta,
+        maximizingPlayer
+      )
+
+      minScore = Math.min(minScore, score)
+      beta = Math.min(beta, score)
+      
+      if (alpha >= beta) break // Alpha-beta pruning
+    }
+    
+    return minScore
+  }
+}
+
+/**
+ * Evaluate a board position for the minimax algorithm
+ */
+function evaluatePosition(state: GameState, player: Player): number {
+  if (state.result === 'win') {
+    return state.currentPlayer === player ? 10000 : -10000
+  }
+  
+  if (state.result === 'draw') {
+    return 0
+  }
+
+  // Use the heuristic evaluation for ongoing games
+  return calculateHeuristic(state.board, player)
+}
+
+/**
  * Get AI move based on difficulty level
  */
 export function getAIMove(
@@ -260,8 +388,7 @@ export function getAIMove(
     case 'moderate':
       return getModerateMove(gameState, player)
     case 'hard':
-      // TODO: Implement in Step 5
-      throw new Error('Hard difficulty not yet implemented')
+      return getHardMove(gameState, player)
     default:
       throw new Error(`Unknown difficulty level: ${difficulty}`)
   }

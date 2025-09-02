@@ -270,10 +270,13 @@ describe('AI', () => {
       expect(move.score).toBeGreaterThan(-Infinity)
     })
 
-    it('should throw error for hard difficulty', () => {
-      expect(() => {
-        getAIMove(gameState, 'O', 'hard')
-      }).toThrow('Hard difficulty not yet implemented')
+    it('should call hard AI for hard difficulty', () => {
+      const move = getAIMove(gameState, 'O', 'hard')
+      
+      expect(move.cell).toBeGreaterThanOrEqual(0)
+      expect(move.cell).toBeLessThan(9)
+      expect(move.score).toBeGreaterThan(-Infinity)
+      expect(move.reason).toContain('Minimax evaluation')
     })
 
     it('should throw error for unknown difficulty', () => {
@@ -292,6 +295,7 @@ describe('AI', () => {
       expect(() => {
         getBeginnerMove(gameState, 'O')
         getModerateMove(gameState, 'O')
+        getAIMove(gameState, 'O', 'hard')
       }).not.toThrow()
     })
 
@@ -301,6 +305,46 @@ describe('AI', () => {
       
       expect(movesX.cell).toBeGreaterThanOrEqual(0)
       expect(movesO.cell).toBeGreaterThanOrEqual(0)
+    })
+  })
+
+  describe('Hard AI - Minimax', () => {
+    it('should always win when possible', () => {
+      gameState.board = ['X', 'X', null, 'O', 'O', null, null, null, null]
+      gameState.currentPlayer = 'X'
+      
+      const move = getAIMove(gameState, 'X', 'hard')
+      expect(move.cell).toBe(2) // Should win at position 2
+      expect(move.reason).toContain('Minimax evaluation')
+    })
+
+    it('should always block opponent win', () => {
+      gameState.board = ['O', 'O', null, 'X', null, null, null, null, null]
+      gameState.currentPlayer = 'X'
+      
+      const move = getAIMove(gameState, 'X', 'hard')
+      expect(move.cell).toBe(2) // Should block at position 2
+      expect(move.reason).toContain('Minimax evaluation')
+    })
+
+    it('should make strategic moves for complex positions', () => {
+      gameState.board = ['X', null, null, null, 'O', null, null, null, null]
+      gameState.currentPlayer = 'X'
+      
+      const move = getAIMove(gameState, 'X', 'hard')
+      expect(move.cell).toBeGreaterThanOrEqual(0)
+      expect(move.cell).toBeLessThan(9)
+      expect(move.reason).toContain('Minimax evaluation')
+    })
+
+    it('should handle endgame scenarios', () => {
+      gameState.board = ['X', 'O', 'X', 'O', 'X', 'O', null, null, null]
+      gameState.currentPlayer = 'O'
+      
+      const move = getAIMove(gameState, 'O', 'hard')
+      expect(move.cell).toBeGreaterThanOrEqual(0)
+      expect(move.cell).toBeLessThan(9)
+      expect(move.reason).toContain('Minimax evaluation')
     })
   })
 })
