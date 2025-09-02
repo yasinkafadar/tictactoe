@@ -6,6 +6,7 @@ import { newGame } from '../engine/types'
 import { applyMove } from '../engine/applyMove'
 import { checkDraw } from '../engine/rules'
 import { getAIMove } from '../engine/ai'
+import { monitoring } from '../lib/monitoring'
 import type { GameState, CellIndex, Player } from '../engine/types'
 import type { DifficultyLevel } from '../engine/ai'
 import './App.css'
@@ -21,6 +22,32 @@ export default function App() {
   const [totalOpponentScore] = useState(0)
   const [isCpuThinking, setIsCpuThinking] = useState(false)
   const isCpuThinkingRef = useRef(false)
+  const gameStartTimeRef = useRef<number>(Date.now())
+  const moveCountRef = useRef<number>(0)
+
+  // Initialize monitoring services
+  useEffect(() => {
+    monitoring.initialize().catch(error => {
+      console.warn('Failed to initialize monitoring:', error)
+    })
+  }, [])
+
+  // Track game state changes
+  useEffect(() => {
+    moveCountRef.current = gameState.moveCount
+    
+    // Track game events
+    if (gameState.result !== 'ongoing') {
+      const gameDuration = Date.now() - gameStartTimeRef.current
+      monitoring.trackGameEvent('game_complete', {
+        result: gameState.result,
+        difficulty,
+        moveCount: gameState.moveCount,
+        duration: gameDuration,
+        winLine: gameState.winLine
+      })
+    }
+  }, [gameState.result, gameState.moveCount, difficulty, gameState.winLine])
 
   // Handle cell clicks from human player
   const handleCellClick = useCallback((cellIndex: CellIndex) => {
@@ -28,11 +55,21 @@ export default function App() {
       return
     }
 
+    // Track user interaction
+    monitoring.trackUserInteraction('cell_click', `cell_${cellIndex}`)
+
     const moveResult = applyMove(gameState, cellIndex)
     if (moveResult.success) {
       setGameState(moveResult.newState)
+      
+      // Track move
+      monitoring.trackGameEvent('human_move', {
+        cellIndex,
+        moveCount: moveResult.newState.moveCount,
+        difficulty
+      })
     }
-  }, [gameState, isCpuThinking])
+  }, [gameState, isCpuThinking, difficulty])
 
   // CPU AI based on difficulty level
   const makeCpuMove = useCallback((state: GameState) => {
@@ -40,13 +77,41 @@ export default function App() {
       return state
     }
 
+    const startTime = Date.now()
+
     try {
       const aiMove = getAIMove(state, CPU_PLAYER, difficulty)
       const moveResult = applyMove(state, aiMove.cell)
       
+      if (moveResult.success) {
+        const moveTime = Date.now() - startTime
+        
+        // Track AI performance
+        monitoring.trackAIPerformance(difficulty, moveTime, moveResult.newState.moveCount)
+        
+        // Track AI move
+        monitoring.trackGameEvent('ai_move', {
+          cellIndex: aiMove.cell,
+          moveCount: moveResult.newState.moveCount,
+          difficulty,
+          moveTime
+        })
+      }
+      
       return moveResult.success ? moveResult.newState : state
     } catch (error) {
       console.error('AI error:', error)
+      
+      // Report AI error to monitoring
+      monitoring.reportError({
+        error: error as Error,
+        context: {
+          difficulty,
+          moveCount: state.moveCount,
+          board: state.board
+        }
+      })
+      
       // Fallback to random move if AI fails
       const availableMoves = state.board
         .map((cell, index) => cell === null ? index : null)
@@ -124,10 +189,15 @@ export default function App() {
   }, [gameState.result])
 
   const handleRematch = useCallback(() => {
+    // Track rematch event
+    monitoring.trackUserInteraction('rematch', 'result_modal')
+    
     setGameState(newGame(HUMAN_PLAYER))
     setIsModalOpen(false)
     setIsCpuThinking(false)
     isCpuThinkingRef.current = false
+    gameStartTimeRef.current = Date.now()
+    moveCountRef.current = 0
   }, [])
 
   const handleModalClose = useCallback(() => {
@@ -135,14 +205,22 @@ export default function App() {
   }, [])
 
   const handleDifficultyChange = useCallback((newDifficulty: DifficultyLevel) => {
+    // Track difficulty change
+    monitoring.trackUserInteraction('difficulty_change', newDifficulty)
+    
     setDifficulty(newDifficulty)
   }, [])
 
   const handleNewGame = useCallback(() => {
+    // Track new game event
+    monitoring.trackUserInteraction('new_game', 'header_button')
+    
     setGameState(newGame(HUMAN_PLAYER))
     setIsModalOpen(false)
     setIsCpuThinking(false)
     isCpuThinkingRef.current = false
+    gameStartTimeRef.current = Date.now()
+    moveCountRef.current = 0
   }, [])
 
   return (
