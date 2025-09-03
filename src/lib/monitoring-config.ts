@@ -33,12 +33,12 @@ export function getMonitoringConfig(): MonitoringConfig {
       release: meta.env?.VITE_APP_VERSION || '1.0.0'
     },
     posthog: {
-      enabled: !!meta.env?.VITE_POSTHOG_KEY,
-      key: meta.env?.VITE_POSTHOG_KEY,
-      host: meta.env?.VITE_POSTHOG_HOST || 'https://app.posthog.com'
+      enabled: !!meta.env?.VITE_PUBLIC_POSTHOG_KEY,
+      key: meta.env?.VITE_PUBLIC_POSTHOG_KEY,
+      host: meta.env?.VITE_PUBLIC_POSTHOG_HOST || 'https://us.i.posthog.com'
     },
     webVitals: {
-      enabled: !!meta.env?.VITE_POSTHOG_KEY // Only enable if PostHog is available
+      enabled: !!meta.env?.VITE_PUBLIC_POSTHOG_KEY // Only enable if PostHog is available
     }
   };
 }

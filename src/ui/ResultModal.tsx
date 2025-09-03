@@ -3,6 +3,7 @@ import type { GameState } from '../engine/types'
 import type { DifficultyLevel } from '../engine/ai'
 import type { ScoreBreakdown } from '../engine/scoring'
 import { calculateScore } from '../engine/scoring'
+import { monitoring } from '../lib/monitoring'
 
 interface ResultModalProps {
   gameState: GameState
@@ -27,14 +28,24 @@ export default function ResultModal({
 
     if (isOpen) {
       dialog.showModal()
+      
+      // Track modal open event
+      monitoring.trackGameEvent('result_modal_opened', {
+        result: gameState.result,
+        difficulty,
+        moveCount: gameState.moveCount,
+        playerScore: calculateScore(gameState, 'X', difficulty).finalScore,
+        opponentScore: calculateScore(gameState, 'O', difficulty).finalScore
+      })
     } else {
       dialog.close()
     }
-  }, [isOpen])
+  }, [isOpen, gameState.result, difficulty, gameState.moveCount])
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
+        monitoring.trackUserInteraction('modal_close', 'escape_key')
         onClose()
       }
     }
@@ -141,14 +152,20 @@ export default function ResultModal({
         <footer className="result-modal__footer">
           <button 
             className="result-modal__button result-modal__button--primary"
-            onClick={onRematch}
+            onClick={() => {
+              monitoring.trackUserInteraction('rematch', 'result_modal_button')
+              onRematch()
+            }}
             autoFocus
           >
             Play Again
           </button>
           <button 
             className="result-modal__button result-modal__button--secondary"
-            onClick={onClose}
+            onClick={() => {
+              monitoring.trackUserInteraction('modal_close', 'close_button')
+              onClose()
+            }}
           >
             Close
           </button>

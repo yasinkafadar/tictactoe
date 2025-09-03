@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import Cell from './Cell'
 import type { GameState, CellIndex } from '../engine/types'
+import { monitoring } from '../lib/monitoring'
 
 interface BoardProps {
   gameState: GameState
@@ -22,6 +23,7 @@ export default function Board({ gameState, onCellClick }: BoardProps) {
       if (cellNumber >= 1 && cellNumber <= 9) {
         const cellIndex = (cellNumber - 1) as CellIndex
         if (!board[cellIndex]) {
+          monitoring.trackUserInteraction('keyboard_move', `key_${key}`)
           onCellClick(cellIndex)
         }
       }
