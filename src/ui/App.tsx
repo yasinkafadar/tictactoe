@@ -258,18 +258,13 @@ export default function App() {
           difficulty={difficulty}
           playerScore={totalPlayerScore}
           opponentScore={totalOpponentScore}
+          isCpuThinking={isCpuThinking}
         />
         
         <Board 
           gameState={gameState}
           onCellClick={handleCellClick}
         />
-
-        {isCpuThinking && (
-          <div className="app__cpu-thinking" aria-live="polite">
-            CPU is thinking...
-          </div>
-        )}
       </main>
 
       <ResultModal

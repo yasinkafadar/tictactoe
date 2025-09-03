@@ -9,9 +9,10 @@ interface HUDProps {
   difficulty: DifficultyLevel
   playerScore: number
   opponentScore: number
+  isCpuThinking: boolean
 }
 
-export default function HUD({ gameState, difficulty, playerScore, opponentScore }: HUDProps) {
+export default function HUD({ gameState, difficulty, playerScore, opponentScore, isCpuThinking }: HUDProps) {
   const [timerState, setTimerState] = useState(() => getTimerState(gameState))
 
   // Update timer every 100ms when game is ongoing
@@ -57,7 +58,9 @@ export default function HUD({ gameState, difficulty, playerScore, opponentScore 
         <div className="hud__section">
           <div className="hud__turn">
             <span className="hud__turn-label">Current Turn:</span>
-            <span className="hud__turn-player">{currentPlayerName} ({gameState.currentPlayer})</span>
+            <span className="hud__turn-player">
+              {isCpuThinking ? 'CPU is thinking...' : `${currentPlayerName} (${gameState.currentPlayer})`}
+            </span>
           </div>
           <div className="hud__moves">
             <span className="hud__moves-label">Moves:</span>
