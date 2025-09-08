@@ -25,14 +25,14 @@ export default function Cell({ mark, index, isWinning, onClick, disabled }: Cell
 
   return (
     <button
-      className={`cell ${isWinning ? 'cell--winning' : ''} ${mark ? 'cell--filled' : ''}`}
+      className={`cell ${isWinning ? 'cell--winning' : ''} ${mark ? 'cell--filled' : ''} ${mark ? `cell--${mark}` : ''}`}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
       disabled={disabled || !!mark}
       aria-label={`Cell ${index + 1}${mark ? `, marked with ${mark}` : ', empty'}`}
       tabIndex={disabled || !!mark ? -1 : 0}
     >
-      <span className="cell__mark" aria-hidden="true">
+      <span className={`cell__mark ${mark ? `cell__mark--${mark}` : ''}`} aria-hidden="true">
         {mark}
       </span>
     </button>
