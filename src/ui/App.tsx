@@ -11,6 +11,41 @@ import type { GameState, CellIndex, Player } from '../engine/types'
 import type { DifficultyLevel } from '../engine/ai'
 import './App.css'
 
+// Add this button component to test Sentry's error tracking
+function ErrorButton() {
+  const handleErrorTest = () => {
+    const meta = import.meta as any;
+    if (!meta.env?.VITE_SENTRY_DSN) {
+      alert('Sentry not configured!\n\nTo test Sentry error tracking:\n1. Go to https://sentry.io/\n2. Create a project\n3. Get your DSN\n4. Add VITE_SENTRY_DSN=your_dsn to .env.local\n5. Restart the dev server');
+      return;
+    }
+    
+    throw new Error('This is your first error!');
+  };
+
+  return (
+    <button
+      onClick={handleErrorTest}
+      style={{
+        position: 'fixed',
+        top: '10px',
+        right: '10px',
+        zIndex: 1000,
+        padding: '8px 12px',
+        backgroundColor: '#ff4444',
+        color: 'white',
+        border: 'none',
+        borderRadius: '4px',
+        cursor: 'pointer',
+        fontSize: '12px',
+        fontFamily: 'monospace'
+      }}
+    >
+      🐛 Test Sentry
+    </button>
+  );
+}
+
 const HUMAN_PLAYER: Player = 'X'
 const CPU_PLAYER: Player = 'O'
 
@@ -225,6 +260,7 @@ export default function App() {
 
   return (
     <div className="app">
+      <ErrorButton />
       <div className="app__header">
         <div className="app__controls">
           <div className="app__difficulty">

@@ -16,6 +16,12 @@ export async function initializeSentry(): Promise<void> {
     
     const meta = import.meta as any;
     
+    // Check if Sentry DSN is configured
+    if (!meta.env?.VITE_SENTRY_DSN) {
+      console.log('🔍 Sentry not configured - no DSN provided. Add VITE_SENTRY_DSN to .env.local to enable error tracking.');
+      return;
+    }
+    
     init({
       dsn: meta.env?.VITE_SENTRY_DSN,
       environment: meta.env?.MODE || 'development',

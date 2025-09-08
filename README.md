@@ -13,7 +13,7 @@ A unique twist on the classic TicTacToe game featuring a "rolling rule" where pl
 ### 🤖 **AI Difficulty Levels**
 - **Beginner**: Random moves with light preferences, blocks threats 50% of the time
 - **Moderate**: Always wins when possible, blocks opponent wins, uses strategic positioning
-- **Hard**: Coming soon - Minimax algorithm with alpha-beta pruning
+- **Hard**: Minimax algorithm with alpha-beta pruning and strategic positioning
 
 ### ⏱️ **Game Mechanics**
 - **Timer System**: 180-second time limit with visual countdown
@@ -108,7 +108,7 @@ The game uses a dynamic scoring formula:
 Score = round(1000 × L × R × (1 / (1 + 0.02×K + 0.01×T)))
 ```
 Where:
-- **L** = Level multiplier (Beginner: 1.0, Moderate: 1.5, Hard: 2.0)
+- **L** = Level multiplier (Beginner: 1.0, Moderate: 1.2, Hard: 1.5)
 - **R** = Result multiplier (Win: 1.0, Draw: 0.5, Loss: 0.0)
 - **K** = Combined move count
 - **T** = Elapsed time in seconds
@@ -173,13 +173,14 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ### Completed ✅
 - [x] Core game engine with rolling rule
-- [x] Basic AI (Beginner and Moderate)
+- [x] Complete AI system (Beginner, Moderate, and Hard)
 - [x] Complete UI with accessibility
 - [x] Scoring and timer systems
 - [x] Comprehensive testing suite
+- [x] Monitoring and analytics integration
+- [x] Build variants (Clean and Crazy)
 
 ### Coming Soon 🚧
-- [ ] Hard AI with Minimax algorithm
 - [ ] Performance optimizations
 - [ ] Additional game modes
 - [ ] Mobile app version
