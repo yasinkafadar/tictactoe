@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client'
 import App from './ui/App.tsx'
 import './index.css'
 import * as Sentry from "@sentry/browser";
+import { Analytics } from '@vercel/analytics/react';
 
 // Initialize Sentry with environment variable
 const meta = import.meta as any;
@@ -23,5 +24,6 @@ if (meta.env?.VITE_SENTRY_DSN) {
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <App />
+    <Analytics />
   </React.StrictMode>,
 )

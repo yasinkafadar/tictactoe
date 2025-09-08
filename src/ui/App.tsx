@@ -7,22 +7,11 @@ import { applyMove } from '../engine/applyMove'
 import { checkDraw } from '../engine/rules'
 import { getAIMove } from '../engine/ai'
 import { monitoring } from '../lib/monitoring'
+import { trackGameStart, trackGameEnd, trackUserInteraction, trackAIPerformance, trackDifficultyChange } from '../lib/analytics'
 import type { GameState, CellIndex, Player } from '../engine/types'
 import type { DifficultyLevel } from '../engine/ai'
 import './App.css'
 
-// Add this button component to test Sentry's error tracking
-function ErrorButton() {
-  return (
-    <button
-      onClick={() => {
-        throw new Error('This is your first error!');
-      }}
-    >
-      Break the world
-    </button>
-  );
-}
 
 const HUMAN_PLAYER: Player = 'X'
 const CPU_PLAYER: Player = 'O'
@@ -43,7 +32,10 @@ export default function App() {
     monitoring.initialize().catch(error => {
       console.warn('Failed to initialize monitoring:', error)
     })
-  }, [])
+    
+    // Track initial game start
+    trackGameStart(difficulty)
+  }, [difficulty])
 
   // Track game state changes
   useEffect(() => {
@@ -52,6 +44,8 @@ export default function App() {
     // Track game events
     if (gameState.result !== 'ongoing') {
       const gameDuration = Date.now() - gameStartTimeRef.current
+      
+      // Track with monitoring system
       monitoring.trackGameEvent('game_complete', {
         result: gameState.result,
         difficulty,
@@ -59,6 +53,9 @@ export default function App() {
         duration: gameDuration,
         winLine: gameState.winLine
       })
+      
+      // Track with Vercel Analytics
+      trackGameEnd(gameState.result, difficulty, gameState.moveCount, gameDuration)
     }
   }, [gameState.result, gameState.moveCount, difficulty, gameState.winLine])
 
@@ -70,6 +67,7 @@ export default function App() {
 
     // Track user interaction
     monitoring.trackUserInteraction('cell_click', `cell_${cellIndex}`)
+    trackUserInteraction('cell_click', `cell_${cellIndex}`)
 
     const moveResult = applyMove(gameState, cellIndex)
     if (moveResult.success) {
@@ -101,6 +99,7 @@ export default function App() {
         
         // Track AI performance
         monitoring.trackAIPerformance(difficulty, moveTime, moveResult.newState.moveCount)
+        trackAIPerformance(difficulty, moveTime, moveResult.newState.moveCount)
         
         // Track AI move
         monitoring.trackGameEvent('ai_move', {
@@ -204,6 +203,7 @@ export default function App() {
   const handleRematch = useCallback(() => {
     // Track rematch event
     monitoring.trackUserInteraction('rematch', 'result_modal')
+    trackUserInteraction('rematch', 'result_modal')
     
     setGameState(newGame(HUMAN_PLAYER))
     setIsModalOpen(false)
@@ -211,7 +211,10 @@ export default function App() {
     isCpuThinkingRef.current = false
     gameStartTimeRef.current = Date.now()
     moveCountRef.current = 0
-  }, [])
+    
+    // Track new game start
+    trackGameStart(difficulty)
+  }, [difficulty])
 
   const handleModalClose = useCallback(() => {
     setIsModalOpen(false)
@@ -220,13 +223,15 @@ export default function App() {
   const handleDifficultyChange = useCallback((newDifficulty: DifficultyLevel) => {
     // Track difficulty change
     monitoring.trackUserInteraction('difficulty_change', newDifficulty)
+    trackDifficultyChange(difficulty, newDifficulty)
     
     setDifficulty(newDifficulty)
-  }, [])
+  }, [difficulty])
 
   const handleNewGame = useCallback(() => {
     // Track new game event
     monitoring.trackUserInteraction('new_game', 'header_button')
+    trackUserInteraction('new_game', 'header_button')
     
     setGameState(newGame(HUMAN_PLAYER))
     setIsModalOpen(false)
@@ -234,11 +239,13 @@ export default function App() {
     isCpuThinkingRef.current = false
     gameStartTimeRef.current = Date.now()
     moveCountRef.current = 0
-  }, [])
+    
+    // Track new game start
+    trackGameStart(difficulty)
+  }, [difficulty])
 
   return (
     <div className="app">
-      <ErrorButton />
       <div className="app__header">
         <div className="app__controls">
           <div className="app__difficulty">
