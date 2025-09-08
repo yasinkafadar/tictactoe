@@ -3,6 +3,7 @@ import type { GameState } from '../engine/types'
 import type { DifficultyLevel } from '../engine/scoring'
 import { getTimerState } from '../lib/timer'
 import { calculateScore } from '../engine/scoring'
+import { monitoring } from '../lib/monitoring'
 
 interface HUDProps {
   gameState: GameState
@@ -10,9 +11,10 @@ interface HUDProps {
   playerScore: number
   opponentScore: number
   isCpuThinking: boolean
+  onRematch: () => void
 }
 
-export default function HUD({ gameState, difficulty, playerScore, opponentScore, isCpuThinking }: HUDProps) {
+export default function HUD({ gameState, difficulty, playerScore, opponentScore, isCpuThinking, onRematch }: HUDProps) {
   const [timerState, setTimerState] = useState(() => getTimerState(gameState))
 
   // Update timer every 100ms when game is ongoing
@@ -36,6 +38,114 @@ export default function HUD({ gameState, difficulty, playerScore, opponentScore,
   const playerScoreBreakdown = calculateScore(gameState, 'X', difficulty)
   const opponentScoreBreakdown = calculateScore(gameState, 'O', difficulty)
 
+  // Game over result helpers
+  const getResultMessage = () => {
+    if (gameState.result === 'draw') {
+      return "It's a Draw!"
+    }
+    if (gameState.result === 'win') {
+      return gameState.currentPlayer === 'X' ? 'You Win!' : 'CPU Wins!'
+    }
+    return 'Game Over'
+  }
+
+  const getResultEmoji = () => {
+    if (gameState.result === 'draw') return '🤝'
+    if (gameState.result === 'win' && gameState.currentPlayer === 'X') return '🎉'
+    return '😔'
+  }
+
+  const getResultClass = () => {
+    if (gameState.result === 'draw') return 'draw'
+    if (gameState.result === 'win' && gameState.currentPlayer === 'X') return 'win'
+    return 'loss'
+  }
+
+  // Show game over display when game ends
+  if (gameState.result !== 'ongoing') {
+    return (
+      <div className="hud hud--game-over">
+        <div className="hud__game-over-header">
+          <div className="hud__game-over-emoji">{getResultEmoji()}</div>
+          <h2 className={`hud__game-over-title hud__game-over-title--${getResultClass()}`}>
+            {getResultMessage()}
+          </h2>
+          <p className="hud__game-over-subtitle">
+            {gameState.result === 'draw' 
+              ? 'The game ended in a tie.'
+              : gameState.result === 'win' && gameState.currentPlayer === 'X'
+              ? 'Congratulations! You defeated the CPU.'
+              : 'The CPU won this round. Better luck next time!'
+            }
+          </p>
+        </div>
+
+        <div className="hud__game-over-scores">
+          <div className="hud__score-card hud__score-card--player">
+            <div className="hud__score-card-header">
+              <span className="hud__score-card-label">You (X)</span>
+              <span className="hud__score-card-value">{playerScore + playerScoreBreakdown.finalScore}</span>
+            </div>
+            <div className="hud__score-card-details">
+              <div className="hud__score-detail">
+                <span>Result:</span>
+                <span>{playerScoreBreakdown.result} (×{playerScoreBreakdown.resultMultiplier})</span>
+              </div>
+              <div className="hud__score-detail">
+                <span>Moves:</span>
+                <span>{playerScoreBreakdown.moveCount}</span>
+              </div>
+              <div className="hud__score-detail">
+                <span>Time:</span>
+                <span>{playerScoreBreakdown.timeSeconds.toFixed(1)}s</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="hud__score-card hud__score-card--opponent">
+            <div className="hud__score-card-header">
+              <span className="hud__score-card-label">CPU (O)</span>
+              <span className="hud__score-card-value">{opponentScore + opponentScoreBreakdown.finalScore}</span>
+            </div>
+            <div className="hud__score-card-details">
+              <div className="hud__score-detail">
+                <span>Result:</span>
+                <span>{opponentScoreBreakdown.result} (×{opponentScoreBreakdown.resultMultiplier})</span>
+              </div>
+              <div className="hud__score-detail">
+                <span>Moves:</span>
+                <span>{opponentScoreBreakdown.moveCount}</span>
+              </div>
+              <div className="hud__score-detail">
+                <span>Time:</span>
+                <span>{opponentScoreBreakdown.timeSeconds.toFixed(1)}s</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {gameState.winLine && (
+          <div className="hud__win-info">
+            <p>Winning line: {gameState.winLine.map(i => i + 1).join(', ')}</p>
+          </div>
+        )}
+
+        <div className="hud__game-over-actions">
+          <button 
+            className="hud__rematch-button"
+            onClick={() => {
+              monitoring.trackUserInteraction('rematch', 'hud_button')
+              onRematch()
+            }}
+          >
+            Play Again
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  // Regular game display
   return (
     <div className="hud">
       <div className="hud__row hud__row--main">
@@ -79,21 +189,6 @@ export default function HUD({ gameState, difficulty, playerScore, opponentScore,
           </div>
         </div>
       </div>
-
-      {gameState.result !== 'ongoing' && (
-        <div className="hud__row hud__row--status">
-          <div className="hud__status">
-            <span className={`hud__status-text hud__status-text--${gameState.result}`}>
-              {gameState.result === 'win' 
-                ? `${gameState.currentPlayer === 'X' ? 'You' : 'CPU'} Win!`
-                : gameState.result === 'draw' 
-                ? 'Draw!'
-                : 'Game Over'
-              }
-            </span>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

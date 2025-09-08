@@ -1,7 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
 import Board from './Board'
 import HUD from './HUD'
-import ResultModal from './ResultModal'
 import { newGame } from '../engine/types'
 import { applyMove } from '../engine/applyMove'
 import { checkDraw } from '../engine/rules'
@@ -19,7 +18,6 @@ const CPU_PLAYER: Player = 'O'
 export default function App() {
   const [gameState, setGameState] = useState<GameState>(() => newGame(HUMAN_PLAYER))
   const [difficulty, setDifficulty] = useState<DifficultyLevel>('beginner')
-  const [isModalOpen, setIsModalOpen] = useState(false)
   const [totalPlayerScore] = useState(0)
   const [totalOpponentScore] = useState(0)
   const [isCpuThinking, setIsCpuThinking] = useState(false)
@@ -193,20 +191,13 @@ export default function App() {
     return () => clearInterval(interval)
   }, [gameState.result])
 
-  // Show modal when game ends
-  useEffect(() => {
-    if (gameState.result !== 'ongoing') {
-      setIsModalOpen(true)
-    }
-  }, [gameState.result])
 
   const handleRematch = useCallback(() => {
     // Track rematch event
-    monitoring.trackUserInteraction('rematch', 'result_modal')
-    trackUserInteraction('rematch', 'result_modal')
+    monitoring.trackUserInteraction('rematch', 'inline_result')
+    trackUserInteraction('rematch', 'inline_result')
     
     setGameState(newGame(HUMAN_PLAYER))
-    setIsModalOpen(false)
     setIsCpuThinking(false)
     isCpuThinkingRef.current = false
     gameStartTimeRef.current = Date.now()
@@ -215,10 +206,6 @@ export default function App() {
     // Track new game start
     trackGameStart(difficulty)
   }, [difficulty])
-
-  const handleModalClose = useCallback(() => {
-    setIsModalOpen(false)
-  }, [])
 
   const handleDifficultyChange = useCallback((newDifficulty: DifficultyLevel) => {
     // Track difficulty change
@@ -234,7 +221,6 @@ export default function App() {
     trackUserInteraction('new_game', 'header_button')
     
     setGameState(newGame(HUMAN_PLAYER))
-    setIsModalOpen(false)
     setIsCpuThinking(false)
     isCpuThinkingRef.current = false
     gameStartTimeRef.current = Date.now()
@@ -280,6 +266,7 @@ export default function App() {
           playerScore={totalPlayerScore}
           opponentScore={totalOpponentScore}
           isCpuThinking={isCpuThinking}
+          onRematch={handleRematch}
         />
         
         <Board 
@@ -288,13 +275,6 @@ export default function App() {
         />
       </main>
 
-      <ResultModal
-        gameState={gameState}
-        difficulty={difficulty}
-        onRematch={handleRematch}
-        onClose={handleModalClose}
-        isOpen={isModalOpen}
-      />
     </div>
   )
 }
