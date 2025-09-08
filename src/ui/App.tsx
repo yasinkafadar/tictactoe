@@ -1,6 +1,8 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
 import Board from './Board'
 import HUD from './HUD'
+import HeaderAd from './ads/HeaderAd'
+import SidebarAd from './ads/SidebarAd'
 import { newGame } from '../engine/types'
 import { applyMove } from '../engine/applyMove'
 import { checkDraw } from '../engine/rules'
@@ -232,6 +234,8 @@ export default function App() {
 
   return (
     <div className="app">
+      <HeaderAd />
+      
       <div className="app__header">
         <div className="app__controls">
           <div className="app__difficulty">
@@ -275,6 +279,7 @@ export default function App() {
         />
       </main>
 
+      <SidebarAd />
     </div>
   )
 }

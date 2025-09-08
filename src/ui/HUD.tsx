@@ -4,6 +4,7 @@ import type { DifficultyLevel } from '../engine/scoring'
 import { getTimerState } from '../lib/timer'
 import { calculateScore } from '../engine/scoring'
 import { monitoring } from '../lib/monitoring'
+import GameOverAd from './ads/GameOverAd'
 
 interface HUDProps {
   gameState: GameState
@@ -150,6 +151,8 @@ export default function HUD({ gameState, difficulty, playerScore, opponentScore,
             <p>Winning line: {gameState.winLine.map(i => i + 1).join(', ')}</p>
           </div>
         )}
+
+        <GameOverAd />
 
         <div className="hud__game-over-actions">
           <button 
