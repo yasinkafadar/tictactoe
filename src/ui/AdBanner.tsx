@@ -15,7 +15,7 @@ export default function AdBanner({
   className = '',
   responsive = true 
 }: AdBannerProps) {
-  const adRef = useRef<HTMLDivElement>(null)
+  const adRef = useRef<HTMLModElement>(null)
 
   useEffect(() => {
     // Only load ads in production or when explicitly enabled
