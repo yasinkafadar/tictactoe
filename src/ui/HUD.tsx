@@ -66,6 +66,27 @@ export default function HUD({ gameState, difficulty, playerScore, opponentScore,
     return (
       <div className="hud hud--game-over">
         <div className="hud__game-over-header">
+          <div className="hud__game-over-logo">
+            <svg width="32" height="32" viewBox="0 0 32 32" className="hud__logo-svg">
+              <defs>
+                <linearGradient id="logoBg" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" style={{stopColor:'#667eea', stopOpacity:1}} />
+                  <stop offset="100%" style={{stopColor:'#764ba2', stopOpacity:1}} />
+                </linearGradient>
+              </defs>
+              <circle cx="16" cy="16" r="15" fill="url(#logoBg)"/>
+              <line x1="10" y1="8" x2="10" y2="24" stroke="#fff" strokeWidth="2" opacity="0.9"/>
+              <line x1="22" y1="8" x2="22" y2="24" stroke="#fff" strokeWidth="2" opacity="0.9"/>
+              <line x1="6" y1="12" x2="26" y2="12" stroke="#fff" strokeWidth="2" opacity="0.9"/>
+              <line x1="6" y1="20" x2="26" y2="20" stroke="#fff" strokeWidth="2" opacity="0.9"/>
+              <line x1="7" y1="9" x2="9" y2="11" stroke="#e74c3c" strokeWidth="2.5" strokeLinecap="round"/>
+              <line x1="9" y1="9" x2="7" y2="11" stroke="#e74c3c" strokeWidth="2.5" strokeLinecap="round"/>
+              <circle cx="24" cy="10" r="2" fill="none" stroke="#3498db" strokeWidth="2.5"/>
+              <line x1="19" y1="15" x2="21" y2="17" stroke="#e74c3c" strokeWidth="2.5" strokeLinecap="round"/>
+              <line x1="21" y1="15" x2="19" y2="17" stroke="#e74c3c" strokeWidth="2.5" strokeLinecap="round"/>
+            </svg>
+            <span className="hud__logo-text">Rolling Tic-Tac-Toe</span>
+          </div>
           <div className="hud__game-over-emoji">{getResultEmoji()}</div>
           <h2 className={`hud__game-over-title hud__game-over-title--${getResultClass()}`}>
             {getResultMessage()}
