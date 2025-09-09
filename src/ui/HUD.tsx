@@ -45,6 +45,9 @@ export default function HUD({ gameState, difficulty, playerScore, opponentScore,
       
       return () => clearTimeout(timer)
     }
+    
+    // Return undefined for ongoing games
+    return undefined
   }, [gameState.result])
 
   const currentPlayerName = gameState.currentPlayer === 'X' ? 'You' : 'CPU'

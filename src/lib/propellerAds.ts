@@ -65,8 +65,8 @@ export function loadPropellerAds(): void {
     // Add click tracking and redirect
     adContainer.addEventListener('click', () => {
       // Track ad click
-      if (typeof gtag !== 'undefined') {
-        gtag('event', 'ad_click', {
+      if (typeof (window as any).gtag !== 'undefined') {
+        (window as any).gtag('event', 'ad_click', {
           'ad_network': 'propellerads',
           'ad_format': 'banner',
           'publisher_id': PROPELLERADS_PUBLISHER_ID
