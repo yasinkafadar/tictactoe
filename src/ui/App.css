@@ -1329,3 +1329,26 @@
     font-size: 1.3rem;
   }
 }
+
+/* Ads Loading Indicator */
+.hud__ads-loading {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  background: rgba(102, 126, 234, 0.1);
+  border: 1px solid rgba(102, 126, 234, 0.2);
+  border-radius: 12px;
+  text-align: center;
+  font-size: 0.85rem;
+  color: #667eea;
+  font-weight: 500;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}

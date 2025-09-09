@@ -4,6 +4,7 @@ import type { DifficultyLevel } from '../engine/scoring'
 import { getTimerState } from '../lib/timer'
 import { calculateScore } from '../engine/scoring'
 import { monitoring } from '../lib/monitoring'
+import { loadPropellerAds } from '../lib/propellerAds'
 
 interface HUDProps {
   gameState: GameState
@@ -16,6 +17,7 @@ interface HUDProps {
 
 export default function HUD({ gameState, difficulty, playerScore, opponentScore, isCpuThinking, onRematch }: HUDProps) {
   const [timerState, setTimerState] = useState(() => getTimerState(gameState))
+  const [adsLoading, setAdsLoading] = useState(false)
 
   // Update timer every 100ms when game is ongoing
   useEffect(() => {
@@ -30,6 +32,20 @@ export default function HUD({ gameState, difficulty, playerScore, opponentScore,
 
     return () => clearInterval(interval)
   }, [gameState])
+
+  // Load PropellerAds when game ends
+  useEffect(() => {
+    if (gameState.result !== 'ongoing') {
+      setAdsLoading(true)
+      // Small delay to ensure game over UI is rendered first
+      const timer = setTimeout(() => {
+        loadPropellerAds()
+        setAdsLoading(false)
+      }, 1000)
+      
+      return () => clearTimeout(timer)
+    }
+  }, [gameState.result])
 
   const currentPlayerName = gameState.currentPlayer === 'X' ? 'You' : 'CPU'
   const difficultyDisplay = difficulty.charAt(0).toUpperCase() + difficulty.slice(1)
@@ -161,6 +177,11 @@ export default function HUD({ gameState, difficulty, playerScore, opponentScore,
           >
             Play Again
           </button>
+          {adsLoading && (
+            <div className="hud__ads-loading">
+              <span>Loading ads...</span>
+            </div>
+          )}
         </div>
       </div>
     )

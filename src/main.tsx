@@ -2,7 +2,6 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './ui/App.tsx'
 import './index.css'
-import { registerServiceWorker } from './lib/serviceWorker'
 import * as Sentry from "@sentry/browser";
 import { Analytics } from '@vercel/analytics/react';
 
@@ -28,6 +27,3 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <Analytics />
   </React.StrictMode>,
 )
-
-// Register service worker for PropellerAds
-registerServiceWorker()
