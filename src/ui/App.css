@@ -815,62 +815,6 @@
   }
 }
 
-/* Ad Styles */
-.ad-placeholder {
-  transition: all 0.3s ease;
-}
-
-.ad-placeholder:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-}
-
-.game-over-ad {
-  margin: 1rem 0;
-  padding: 0.5rem;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 8px;
-  backdrop-filter: blur(10px);
-}
-
-.sidebar-ad {
-  position: fixed;
-  right: 20px;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 100;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  padding: 1rem;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-}
-
-.header-ad {
-  margin: 1rem 0;
-  padding: 0.5rem;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 8px;
-  backdrop-filter: blur(10px);
-}
-
-/* Mobile ad adjustments */
-@media (max-width: 768px) {
-  .sidebar-ad {
-    position: static;
-    transform: none;
-    margin: 1rem auto;
-    width: fit-content;
-  }
-  
-  .header-ad {
-    margin: 0.5rem 0;
-  }
-  
-  .game-over-ad {
-    margin: 0.5rem 0;
-  }
-}
 
 /* Premium Features Styles */
 .premium-cta {
